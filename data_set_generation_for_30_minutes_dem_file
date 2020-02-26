@@ -1,0 +1,58 @@
+package sample_cases;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class dem {
+	public void myMethod(List<Double> ele, List<Double> ele1){
+	  
+		  
+	  
+
+    try (PrintWriter writer = new PrintWriter(new File("testtor.csv"))) {
+    	
+
+      StringBuilder sb = new StringBuilder();
+      System.out.println("Inside New class");
+      
+      
+      sb.append("OS_CPU_IDLE,");
+      sb.append(',');
+      sb.append("OS_PHYSICAL_MEMORY_FREE");
+      sb.append(',');
+      sb.append("TARGET");
+      sb.append('\n');
+      Iterator<Double> it1 = ele.iterator();
+      Iterator<Double> it2 = ele1.iterator();
+      while(it1.hasNext()&&it2.hasNext())
+      {
+    	  sb.append(it1.next());
+    	  sb.append(',');
+    	  sb.append(it2.next());
+    	  sb.append(',');
+          if(it1.next() < 60.0000000000000)
+          {
+        	  sb.append(2);
+          }
+          else if(it2.next()<1.19999999999999)
+          {
+        	  sb.append(2);
+          }
+          else {
+        	  sb.append(1);
+          }
+          sb.append('\n');
+          }
+ writer.write(sb.toString());
+ System.out.println("done!");
+
+    } catch (FileNotFoundException e) {
+      System.out.println(e.getMessage());
+    }
+	  }
+
+  }
