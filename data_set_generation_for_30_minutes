@@ -1,0 +1,114 @@
+package sample_cases;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.PasswordAuthentication;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class json_to_csv {
+	public static void main(String[] args) throws KeyManagementException, UnrecoverableKeyException, NoSuchAlgorithmException, NoSuchProviderException, CertificateException, KeyStoreException, IOException, InterruptedException {
+		dem dm =new dem();
+		String  readLine = null;
+		int c =0;
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmss00");
+		LocalDateTime now = LocalDateTime.of(2020, 02, 10, 23,00,01,00);
+		LocalDateTime now1 = LocalDateTime.of(2020, 02, 10, 23,30,01,00);
+		List<Double> ele = new ArrayList<>();
+		List<Double> ele1 = new ArrayList<>();
+	    while (c < 200) 
+	    {
+			now= now.plusMinutes(30);
+	    	now1 = now1.plusMinutes(30);
+            //Thread.sleep(5 * 1000);
+            String s=now.format(dtf);
+            String s1 =now1.format(dtf);
+            String url = "https://bawd1.fyre.ibm.com:9443/ibm/iis/ds/api/engines/bawd1.fyre.ibm.com/monitors/os_cpu_idle/";
+            url += s+"-"+s1;
+            URL url1 = new URL(url);
+            System.out.println(url1);	
+            String url2 = "https://bawd1.fyre.ibm.com:9443/ibm/iis/ds/api/engines/bawd1.fyre.ibm.com/monitors/os_memory_physical_free/";
+            url2 += s+"-"+s1;
+            URL url3 = new URL(url2);
+            System.out.println(url3);	
+            HttpURLConnection conection = (HttpURLConnection) url1.openConnection();
+            HttpURLConnection conection1 = (HttpURLConnection) url3.openConnection();
+            Authenticator.setDefault(new Authenticator(){
+			@Override
+			    protected PasswordAuthentication getPasswordAuthentication(){          
+			       String login = "isadmin";
+				String password = "ibm_0123";
+				return new PasswordAuthentication(login, password.toCharArray());
+			    }
+			});
+			conection.setRequestMethod("GET");
+			conection.setRequestProperty("Accept", "application/json");
+			conection1.setRequestMethod("GET");
+			conection1.setRequestProperty("Accept", "application/json");
+		    int responseCode = conection.getResponseCode();
+		    int responseCode1 = conection1.getResponseCode();
+		    System.out.println("response code:"+ responseCode);
+		    System.out.println("response code 1:"+ responseCode1);
+		   if ((responseCode == HttpURLConnection.HTTP_OK)&&(responseCode1 == HttpURLConnection.HTTP_OK))
+		    {
+		    				BufferedReader in = new BufferedReader(
+		    							new InputStreamReader(conection.getInputStream()));
+		    				BufferedReader in1 = new BufferedReader(
+		    							new InputStreamReader(conection1.getInputStream()));
+		       System.out.println("connection input stream:" +in.toString());
+		       System.out.println("connection input stream:" +in1.toString());
+		       StringBuffer response = new StringBuffer();
+		       StringBuffer response1 = new StringBuffer();
+		       while ((readLine = in .readLine()) != null) 
+		        	{
+		            response.append(readLine);
+		        	} in .close();
+		       while ((readLine = in1 .readLine()) != null) 
+		       		{
+		            response1.append(readLine);
+		       		} in1 .close();
+		       String res=response.toString();
+		       String res1 = response1.toString();
+		       String v = "timeWeightedAvg";
+		       int x =res.indexOf("timeWeightedAvg");
+		       System.out.println(x);
+		       int y = v.length();
+		       int sum = x+y;
+		       int  sum1 =sum+3;
+		       int z = res.indexOf("type");
+		       z = z-6;
+		       int sum2=sum+2;
+		       String str1 = res.substring(sum1, z);
+		       String str2 = res1.substring(sum2, z);
+		       System.out.println(str1);
+		       System.out.println(str2);
+		      
+		       ele.add(Double.parseDouble(str1));
+		       ele1.add(Double.parseDouble(str2));
+		       
+			   }
+		    
+		       else {  
+		        System.out.println("GET NOT WORKED");
+		            }
+		    c++;
+		    System.out.println("The value of c is :=" +c);
+		    
+		 }
+	    
+	    		
+	    		dm.myMethod(ele, ele1);
+}
+}
