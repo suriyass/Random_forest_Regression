@@ -1,0 +1,141 @@
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.PasswordAuthentication;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+public class total_job_runs {
+
+public static void main(String[] args) throws KeyManagementException, UnrecoverableKeyException, NoSuchAlgorithmException, NoSuchProviderException, CertificateException, KeyStoreException, JSONException, ParseException {
+		
+		try {
+			total_job_runs.MyGETRequest();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+}
+
+public static void MyGETRequest() throws IOException, NoSuchAlgorithmException, NoSuchProviderException, 
+KeyManagementException, CertificateException, KeyStoreException, UnrecoverableKeyException, JSONException, ParseException {
+	
+	System.out.println("Enter the startdate adn end date");
+	Scanner s = new Scanner(System.in);
+	String sd = s.next();
+	String ed = s.next();
+	String urlx = "https://bawd1.fyre.ibm.com:9443/ibm/iis/ds/api/engines/bawd1.fyre.ibm.com/jobruns/";
+    urlx += sd+"-"+ed;
+    URL urly = new URL(urlx);
+	String readLine = null;
+	sam se = new sam();
+    HttpURLConnection conection = (HttpURLConnection) urly.openConnection();
+    Authenticator.setDefault(new Authenticator(){
+		@Override
+		    protected PasswordAuthentication getPasswordAuthentication(){          
+		       String login = "isadmin";
+			String password = "ibm_0123";
+			return new PasswordAuthentication(login, password.toCharArray());
+		    }
+		});
+    conection.setRequestMethod("GET");
+    conection.setRequestProperty("Accept", "application/json");
+    int responseCode = conection.getResponseCode();
+    System.out.println("response code:"+ responseCode);
+    System.out.println("response equal value:"+HttpURLConnection.HTTP_OK);
+    if (responseCode == HttpURLConnection.HTTP_OK) {
+        BufferedReader in = new BufferedReader(
+            new InputStreamReader(conection.getInputStream()));
+        System.out.println("connection input stream:" +in);
+        StringBuffer response = new StringBuffer();
+        while ((readLine = in .readLine()) != null) {
+            response.append(readLine);
+        } in .close();
+        String res=response.toString();
+        ArrayList<String> elephantList = new ArrayList<>(Arrays.asList(res));
+
+        for(String y11 :elephantList)
+        {
+        	 System.out.println(y11.toString());	
+        }
+
+        FileWriter file = new FileWriter("IsL.json");
+        file.write(elephantList.toString());
+        file.flush();
+        
+       
+     
+        
+      
+        JSONObject req = new JSONObject(response.toString());
+        System.out.println(req);
+        JSONArray recs = req.getJSONArray("items");
+        System.out.println(recs);
+        for (int i = 0; i < recs.length(); ++i) {
+            JSONObject rec = recs.getJSONObject(i);
+            String st  = rec.getString("runStartDate");
+            String loc = rec.getString("runEndDate");
+        	String result = st.replaceAll("[-+.^:,T]","");
+        	String result1 = loc.replaceAll("[-+.^:,T]","");
+        	System.out.println(result);
+            System.out.println(result1);
+            System.out.println(result.substring(0,16));
+            System.out.println(result1.substring(0,16));
+            String re = result.substring(0,16);
+            String re1 = result1.substring(0,16);
+            String r = result.substring(8, 16);
+            String r1 = result1.substring(8, 16);
+            System.out.println(r);
+            System.out.println(r1);
+            int k  = Integer.parseInt(r);
+            int j = Integer.parseInt(r1);
+            int x = j-k;
+            System.out.println(x);
+            String h = Integer.toString(x);
+            se.rescue(re,re1,h);
+            System.out.println("data passing");
+            //System.out.println(h.substring(0, 1));
+            
+            
+            
+        }
+    
+    
+    
+    
+    
+    
+    }
+else {
+        System.out.println("GET NOT WORKED");
+    }
+    
+    
+
+}
+
+
+	
+}
+
+	
+
+
